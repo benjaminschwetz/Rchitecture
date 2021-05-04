@@ -1,0 +1,21 @@
+before_install:
+  - pip3 install -r requirements.txt
+  - python3 -m nltk.downloader -d ~/nltk_data punkt
+
+language: python
+python:
+  - "3.6"
+cache:
+  pip: true
+  directories:
+   - $HOME/virtualenv
+
+env:
+
+
+install: "python3 setup.py install"
+
+script: ./run_tests.sh 
+
+after_success:
+  coveralls
