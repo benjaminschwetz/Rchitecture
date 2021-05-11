@@ -1,0 +1,84 @@
+---
+title: "internal_dependencies"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{internal_dependencies}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Import packages 
+
+```{r setup}
+library(Rchitecture)
+library(purrr)
+library(dplyr)
+library(stringr)
+```
+
+
+## Converting zeeguu_core into import_from network
+
+```{r}
+folder <- system.file("example_data/Zeeguu-Ecosystem/Zeeguu-API/zeeguu_core", package = "Rchitecture")
+files <- list.files(folder, recursive = TRUE, full.names = TRUE) %>% 
+ stringr::str_extract(".*\\.py$") %>%
+    na.omit()
+edges <- map(files, import_from)
+edge_table <- map_df(edges, transpose)
+node_table <- tibble::tibble(
+  id = unique(c(edge_table$to, edge_table$from)),
+  label= str_remove(id, paste0(folder, "/")),
+  folder = folder,
+  subfolder = str_remove(label, "[^/]+$")
+) %>% 
+  mutate_at(vars(-id),
+            ~str_replace_all(.x, "/+", "/")
+            )
+```
+
+```{r}
+library(tidygraph)
+graph <- tbl_graph(
+  nodes = node_table,
+  edges = edge_table
+) %>% 
+  activate("nodes") %>% 
+  mutate(graph_component = group_components()) # numeric for connected components
+```
+
+### Preview
+```{r}
+library(ggraph)
+ggraph(graph, layout = "igraph", algorithm = "fr") +
+  geom_edge_diagonal() +
+  geom_node_point(aes(color = subfolder)) +
+  scale_color_brewer(type = "qual") +
+  theme_void()
+```
+
+
+
+# What is interesting?
+
+
+subgraphs that have imports across subfolders of zeeguu core.
+```{r}
+as_tibble(graph) %>% group_by(graph_component) %>% summarise(n_distinct(subfolder))
+```
+
+
+```{r}
+library(ggraph)
+ggraph(graph, layout = "fr")+
+  geom_edge_diagonal(arrow = arrow())+
+  geom_node_label(aes(label = label))
+```
+
