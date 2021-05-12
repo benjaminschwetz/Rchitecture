@@ -1,0 +1,66 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Rchitecture
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+This package is my report for the architectural recovery assignment on the Software Architecture course at ITU in Spring 2021. The purpose is to recover meaningful views from a software project. I went with the default example, the [Zeeguu-Api](https://github.com/zeeguu-ecosystem/Zeeguu-API) for analysis. 
+
+## Approach and dependencies
+
+After some initial struggles with parsing the python AST trees in R I settled on the following :
+
+- [kavon/yaml-ast](https://github.com/kavon/yaml-ast) and [maligree/python-ast-explorer](https://github.com/maligree/python-ast-explorer) for parsing python AST into data structures.
+- 📦`reticulate` for calling those python scripts from R
+- 📦`data.tree` for parsing yaml (and directories) into data.tree objects that could then be converted into igraph objects
+- 📦`igraph` behind the scenes and for implementations of different graph algorithms
+- 📦`tidygraph` for a tidy interface to manipulate the graphs
+- 📦`ggraph` for plotting graphs
+
+Furthermore, I am using 📦`tidyverse` for most of the data manipulation and additional plotting. The documentation website is built using 📦`pkgdown`.
+## Installation
+
+You can install the released version of Rchitecture from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("Rchitecture")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(Rchitecture)
+## basic example code
+```
+
+What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+
+```{r cars}
+summary(cars)
+```
+
+You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
+
+You can also embed plots, for example:
+
+```{r pressure, echo = FALSE}
+plot(pressure)
+```
+
+In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.

@@ -1,0 +1,32 @@
+---
+title: "text_mining_ast"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{text_mining_ast}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(Rchitecture)
+library(quanteda)
+```
+
+```{r}
+folder <- system.file("example_data/Zeeguu-Ecosystem/Zeeguu-API/zeeguu_core", package = "Rchitecture")
+files <- extract_py_script_paths(folder)
+```
+
+```{r}
+df_mat <- tokenize_ast(files) %>% 
+  tokens() %>% 
+  dfm()
+```
+

@@ -6,9 +6,9 @@
 #' @export
 #'
 #' @examples
-content_table <- function(project_path = system.file("example_data/Zeeguu-Ecosystem/", package="Rchitecture")) {
+content_table <- function(project_path , include_folders) {
   #requires a little hack to stay pretty both with relative paths and system.file()
-  data <- file.info(list.files(project_path, recursive = TRUE, full.names = TRUE, include.dirs = TRUE))[,1:2]
+  data <- file.info(list.files(project_path, recursive = TRUE, full.names = TRUE, include.dirs = include_folders))[,1:2]
   tbl_data <- tibble::rownames_to_column(data, "path")
   out <- tbl_data %>%
     dplyr::mutate(

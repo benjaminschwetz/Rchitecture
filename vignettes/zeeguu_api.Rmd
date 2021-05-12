@@ -1,0 +1,69 @@
+---
+title: "zeeguu_api"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{zeeguu_api}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(Rchitecture)
+library(tidyverse)
+library(data.tree)
+```
+
+
+## Gathering data
+
+```{r}
+temp_folder <- tempdir()
+zeeguu_path <- paste0(temp_folder, "/zeeguu_api")
+git2r::clone(url = "https://github.com/zeeguu-ecosystem/Zeeguu-API.git",
+             local_path  = zeeguu_path)
+```
+## Overview of the repo
+
+```{r}
+folder_contents <- content_table(zeeguu_path, include_folders = FALSE)
+```
+
+```{r}
+folder_contents %>% 
+  mutate(
+    file_type = fct_infreq(file_type)
+  ) %>% 
+  group_by(file_type) %>% 
+  summarise(
+    n_files = n_distinct(file_name),
+    file_size_sum = sum(size, na.rm = TRUE),
+    file_size_mean = mean(size),
+    file_size_median = median(size),
+    file_size_min = min(size, na.rm = TRUE),
+    file_size_max = max(size, na.rm = TRUE)
+  ) %>% 
+  mutate_if(is.numeric,round)
+```
+- python project
+- using sql (db storage)
+- web project (lot of html data)
+- has a license
+- using one docker image for the entire repo
+- some shell scripts
+
+## Folder tree
+
+```{r}
+folder_tree <- data.tree::as.Node(data.frame(pathString = list.dirs(zeeguu_path, recursive = TRUE)))
+plot(folder_tree)
+```
+
+
+

@@ -74,11 +74,3 @@ subgraphs that have imports across subfolders of zeeguu core.
 as_tibble(graph) %>% group_by(graph_component) %>% summarise(n_distinct(subfolder))
 ```
 
-
-```{r}
-library(ggraph)
-ggraph(graph, layout = "fr")+
-  geom_edge_diagonal(arrow = arrow())+
-  geom_node_label(aes(label = label))
-```
-
