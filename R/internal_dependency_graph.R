@@ -122,18 +122,18 @@ internal_dependency_graph <- function(project_path, path_prefix) {
   g_layout <-ggraph::layout_to_table(igraph::layout_as_tree, layout_graph, circular = TRUE) %>%
     dplyr::select(V1, V2) %>%
     graphlayouts::layout_rotate(90)
-
+library(ggraph)#aes acts funny
   ggraph::ggraph(tbl_gr_acum, layout = "manual", x=g_layout[,1],y=g_layout[,2]) +
-    ggraph::geom_edge_link(ggplot2::aes(filter = type == "contains"))+
-        ggraph::geom_node_label(ggplot2::aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
+    ggraph::geom_edge_link(aes(filter = type == "contains"))+
+        ggraph::geom_node_label(aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
 
         ggraph::geom_edge_arc(
-          ggplot2::aes(
+          aes(
         filter = type == "depends_on",
         edge_width = occurences,
         alpha= occurences),       color = "deepskyblue3", arrow = ggplot2::arrow(angle = 5, type = "closed"))+
     #ggraph::scale_edge_color_distiller(direction = 1)+
-    ggraph::geom_node_text(ggplot2::aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
+    ggraph::geom_node_text(aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
     ggplot2::coord_fixed() +
     ggplot2::theme_void()
 }

@@ -116,7 +116,7 @@ I made a crude tokenizer from the `ast` module and used it to parse all `.py` fi
 ```{r eval=FALSE}
 internal_dependency_graph(zeeguu_path, temp_folder)
 ```
-
+![View](view_img.png){width=100%}
 
 The view cleary shows that `zeeguu_core` and more specifically `model` and `language` are heavily dependet on. One could argue that they were named properly. There is some overplotting occurring but it is still possible to look read dependencies for some of the nodes, i.e. `account_management` depends on the `teacher` module. 
 
