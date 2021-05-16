@@ -32,35 +32,27 @@ After some initial struggles with parsing the python AST trees in R I settled on
 - 📦`ggraph` for plotting graphs
 
 Furthermore, I am using 📦`tidyverse` for most of the data manipulation and additional plotting. The documentation website is built using 📦`pkgdown`.
-## Installation
 
-You can install the released version of Rchitecture from [CRAN](https://CRAN.R-project.org) with:
+## Reproduction
+
+You can install this package from github. R dependencies should be installed automatically for reproducing what worked out. For dependencies for things that didn't work out and python, some debugging might be required. Please ask :) 
 
 ``` r
-install.packages("Rchitecture")
+remotes::install_github("benjaminschwetz/Rchitecture")
 ```
 
-## Example
+## Example: Zeeguu Api
 
-This is a basic example which shows you how to solve a common problem:
+For the assignment, I made some summary and a dependency view. They are in `vignette(zeeguu_api, package = "Rchitecture)`
 
-```{r example}
-library(Rchitecture)
-## basic example code
-```
+## What didn't work
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+❌ Using the structure of the ast tree.  Not sure if it is my lack of python knowledge or lack of tree wrangling skills but I didn't find a good way to use the tree for anything, except splitting the script code into tokens. I killed a lot of time with this.
+❌ Simplifying the graph using edgebundling from  `shochastics/edgebundle`.  I think my graph was too messy. for the algorithm. see `edgebundling_failed()`. Depends on datashader (python) package.
 
-```{r cars}
-summary(cars)
-```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
+## What I didn't have time for in the end
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+⏱️ Making a graph of external dependencies. I started parsing out the requirements.txt but didn't have time to generate a separate graph viz for it. See `generate_dependency_graph()`
+⏱ Refactor code.  A lot of stuff could be reused,/ is copy pasted across funtions right now.
+⏱ Parameterize the  notebook: give it a github path and autogenerate the viz.
