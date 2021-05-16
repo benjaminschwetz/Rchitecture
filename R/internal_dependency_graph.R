@@ -9,7 +9,7 @@ internal_dependency_graph <- function(project_path, path_prefix) {
     dplyr::filter(file_type == "py")
   tree_py <- data.tree::as.Node(folder_contents,pathName="path")
   tree_py$Do(function(x) {
-    x$content_type <- Aggregate(node = x,
+    x$content_type <- data.tree::Aggregate(node = x,
                                 attribute = "file_type",
                                 aggFun = function(x){
                                   n_vals <- length(unique(x))
@@ -66,15 +66,15 @@ internal_dependency_graph <- function(project_path, path_prefix) {
     tidygraph::graph_join(tbl_gr_py_clean,
                           by = "name") %>%
     tidygraph::mutate(
-      index = row_number(),
+      index = dplyr::row_number(),
       in_degree_total = tidygraph::centrality_degree( mode = "in"),
       out_degree_total = tidygraph::centrality_degree( mode = "out")
     ) %>%
     tidygraph::morph(
       function(graph){
         graph %>%
-          activate("edges") %>%
-          filter(type != "depends_on")
+          tidygraph::activate("edges") %>%
+          tidygraph::filter(type != "depends_on")
       }
     ) %>%
     tidygraph::mutate(
@@ -85,17 +85,17 @@ internal_dependency_graph <- function(project_path, path_prefix) {
   # tidygraph::reroute
   # find parents
   parents <- tbl_gr_all %>%
-    activate("edges") %>%
-    filter(type == "contains") %>%
-    as_tibble() %>%
-    select(parent = from,
+    tidygraph::activate("edges") %>%
+    tidygraph::filter(type == "contains") %>%
+    tibble::as_tibble() %>%
+    dplyr::select(parent = from,
            from = to# node in question
     )
   rerouted_edges <- tbl_gr_all %>%
-    activate("edges") %>%
-    as_tibble() %>%
-    left_join(parents, by = "from") %>%
-    mutate(
+    tidygraph::activate("edges") %>%
+    tibble::as_tibble() %>%
+    dplyr::left_join(parents, by = "from") %>%
+    dplyr::mutate(
       old_from = from,
       from =  dplyr::case_when(
         type == "depends_on" ~ parent,
@@ -105,35 +105,35 @@ internal_dependency_graph <- function(project_path, path_prefix) {
     dplyr::summarise(occurences = sum(occurences)) %>%
     dplyr::ungroup()
   tbl_gr_acum <- tidygraph::tbl_graph(
-    nodes = tbl_gr_all %>% activate("nodes") %>% as_tibble(),
+    nodes = tbl_gr_all %>% tidygraph::activate("nodes") %>% tibble::as_tibble(),
     edges = rerouted_edges,
     directed = TRUE
   ) %>%
-    filter(out_degree_struc != 0)
+    tidygraph::filter(out_degree_struc != 0)
   # calc layout
   layout_graph <- tbl_gr_acum %>%
-    activate("edges") %>%
+    tidygraph::activate("edges") %>%
     tidygraph::convert(
       function(graph){
         graph %>%
-          filter(type != "depends_on")
+          tidygraph::filter(type != "depends_on")
       }
     )
-  g_layout <- layout_to_table(layout_as_tree, layout_graph, circular = TRUE) %>%
-    select(V1, V2) %>%
+  g_layout <-ggraph::layout_to_table(igraph::layout_as_tree, layout_graph, circular = TRUE) %>%
+    dplyr::select(V1, V2) %>%
     graphlayouts::layout_rotate(90)
 
   ggraph::ggraph(tbl_gr_acum, layout = "manual", x=g_layout[,1],y=g_layout[,2]) +
-    ggraph::geom_edge_link(aes(filter = type == "contains"))+
-        ggraph::geom_node_label(aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
+    ggraph::geom_edge_link(ggplot2::aes(filter = type == "contains"))+
+        ggraph::geom_node_label(ggplot2::aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
 
         ggraph::geom_edge_arc(
-      aes(
+          ggplot2::aes(
         filter = type == "depends_on",
         edge_width = occurences,
-        alpha= occurences),       color = "deepskyblue3", arrow = arrow(angle = 5, type = "closed"))+
+        alpha= occurences),       color = "deepskyblue3", arrow = ggplot2::arrow(angle = 5, type = "closed"))+
     #ggraph::scale_edge_color_distiller(direction = 1)+
-    ggraph::geom_node_text(aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
+    ggraph::geom_node_text(ggplot2::aes(label = short_name, filter = out_degree_struc > 0, size = in_degree_total))+ # or maybe here
     ggplot2::coord_fixed() +
     ggplot2::theme_void()
 }

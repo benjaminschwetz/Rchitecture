@@ -4,9 +4,7 @@
 \alias{content_table}
 \title{Title}
 \usage{
-content_table(
-  project_path = system.file("example_data/Zeeguu-Ecosystem/", package = "Rchitecture")
-)
+content_table(project_path, include_folders, path_prefix)
 }
 \arguments{
 \item{project_path}{}

@@ -81,7 +81,7 @@ folder_contents <- content_table(zeeguu_path, include_folders = FALSE, temp_fold
 ```{r}
 folder_contents %>% 
   mutate(
-    file_type = fct_infreq(file_type)
+    file_type = forcats::fct_infreq(file_type)
   ) %>% 
   group_by(file_type) %>% 
   summarise(
@@ -89,7 +89,8 @@ folder_contents %>%
     file_size_sum = sum(size, na.rm = TRUE),
     file_size_median = median(size)
   ) %>% 
-  mutate_if(is.numeric,round)
+  mutate_if(is.numeric,round) %>% 
+  knitr::kable()
 ```
 From this table we can see that: 
 - it is likely a python project, because of the high number of python files
@@ -112,9 +113,11 @@ This view shows that `Zeeguu_core` and `Zeeguu_api` are the two only pure python
 
 I made a crude tokenizer from the `ast` module and used it to parse all `.py` files in the repository. Then I matched those tokens against the list of folder names in the repository to get a list of tokens that are (likely) dependencies. I then generated a graph, treating these mentions as edges. As it had too many nodes for a meaningful plot, I simplified the graph by aggregating the edges on a folder level. To preserve the weight information, I simply summed up the number of occurrences. I then arranged the nodes using a circular tree layout, based on the path hierarchy and encoded `occurences` in edge width and alpha. To make the plot more readable, I also scaled the nodes proportional to their centrality degree, counting incoming edges. 
 
-```{r}
+```{r eval=FALSE}
 internal_dependency_graph(zeeguu_path, temp_folder)
 ```
+
+
 The view cleary shows that `zeeguu_core` and more specifically `model` and `language` are heavily dependet on. One could argue that they were named properly. There is some overplotting occurring but it is still possible to look read dependencies for some of the nodes, i.e. `account_management` depends on the `teacher` module. 
 
 ## Discussion
