@@ -47,12 +47,12 @@ For the assignment, I made some summary and a dependency view. They are in `vign
 
 ## What didn't work
 
-❌ Using the structure of the ast tree.  Not sure if it is my lack of python knowledge or lack of tree wrangling skills but I didn't find a good way to use the tree for anything, except splitting the script code into tokens. I killed a lot of time with this.
-❌ Simplifying the graph using edgebundling from  `shochastics/edgebundle`.  I think my graph was too messy. for the algorithm. see `edgebundling_failed()`. Depends on datashader (python) package.
+- ❌ Using the structure of the ast tree.  Not sure if it is my lack of python knowledge or lack of tree wrangling skills but I didn't find a good way to use the tree for anything, except splitting the script code into tokens. I killed a lot of time with this.
+- ❌ Simplifying the graph using edgebundling from  `shochastics/edgebundle`.  I think my graph was too messy. for the algorithm. see `edgebundling_failed()`. Depends on datashader (python) package.
 
 
 ## What I didn't have time for in the end
 
-⏱️ Making a graph of external dependencies. I started parsing out the requirements.txt but didn't have time to generate a separate graph viz for it. See `generate_dependency_graph()`
-⏱ Refactor code.  A lot of stuff could be reused,/ is copy pasted across funtions right now.
-⏱ Parameterize the  notebook: give it a github path and autogenerate the viz.
+- ⏱️ Making a graph of external dependencies. I started parsing out the requirements.txt but didn't have time to generate a separate graph viz for it. See `generate_dependency_graph()`
+- ⏱ Refactor code.  A lot of stuff could be reused,/ is copy pasted across funtions right now.
+- ⏱ Parameterize the  notebook: give it a github path and autogenerate the viz.
