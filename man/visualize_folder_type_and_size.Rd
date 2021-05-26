@@ -4,7 +4,7 @@
 \alias{visualize_folder_type_and_size}
 \title{Visualize folder type and size}
 \usage{
-visualize_folder_type_and_size(folder_path, path_prefix)
+visualize_folder_type_and_size(folder_path, path_prefix, .ignore_regex = NULL)
 }
 \arguments{
 \item{folder_path}{path to the repository}

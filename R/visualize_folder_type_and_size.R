@@ -3,10 +3,10 @@
 #' @param folder_path path to the repository
 #' @param path_prefix leading folders from absolute path to omit from visualization.
 #' @export
-visualize_folder_type_and_size <- function(folder_path, path_prefix){
+visualize_folder_type_and_size <- function(folder_path, path_prefix, .ignore_regex = NULL){
   set.seed(35)
   # browser()
-  folder_contents <- content_table(zeeguu_path, include_folders = FALSE, path_prefix) %>%
+  folder_contents <- content_table(zeeguu_path, include_folders = FALSE, path_prefix, .ignore_regex) %>%
     mutate(path = stringr::str_replace_all(path,"/+", "/"))
   tree <- data.tree::as.Node(folder_contents,pathName="path")
   tree$Do(function(x) {

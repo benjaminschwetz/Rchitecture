@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Rchitecture</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -135,7 +135,7 @@
     <p>Visualize internal dependencies</p>
     </div>
 
-    <pre class="usage"><span class='fu'>internal_dependency_graph</span><span class='op'>(</span><span class='va'>project_path</span>, <span class='va'>path_prefix</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>internal_dependency_graph</span><span class='op'>(</span><span class='va'>project_path</span>, <span class='va'>path_prefix</span>, .ignore_regex <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,6 +147,10 @@
     <tr>
       <th>path_prefix</th>
       <td><p>leading folders from absolute path to omit from visualization.</p></td>
+    </tr>
+    <tr>
+      <th>.ignore_regex</th>
+      <td><p>regex pattern for paths to exclude</p></td>
     </tr>
     </table>
 

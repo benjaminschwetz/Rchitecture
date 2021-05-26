@@ -4,12 +4,14 @@
 \alias{internal_dependency_graph}
 \title{Visualize internal dependencies}
 \usage{
-internal_dependency_graph(project_path, path_prefix)
+internal_dependency_graph(project_path, path_prefix, .ignore_regex = NULL)
 }
 \arguments{
 \item{project_path}{path to the repository}
 
 \item{path_prefix}{leading folders from absolute path to omit from visualization.}
+
+\item{.ignore_regex}{regex pattern for paths to exclude}
 }
 \description{
 Visualize internal dependencies

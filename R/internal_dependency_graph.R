@@ -1,10 +1,12 @@
 #' Visualize internal dependencies
 #'
 #' @param project_path path to the repository
+#' @param .ignore_regex regex pattern for paths to exclude
 #' @param path_prefix leading folders from absolute path to omit from visualization.
+#'
 #' @export
-internal_dependency_graph <- function(project_path, path_prefix) {
-  folder_contents <- content_table(project_path, include_folders = FALSE, path_prefix) %>%
+internal_dependency_graph <- function(project_path, path_prefix, .ignore_regex = NULL) {
+  folder_contents <- content_table(project_path, include_folders = FALSE, path_prefix, .ignore_regex) %>%
     mutate(path = stringr::str_replace_all(path,"/+", "/")) %>%
     dplyr::filter(file_type == "py")
   tree_py <- data.tree::as.Node(folder_contents,pathName="path")

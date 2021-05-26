@@ -1,6 +1,6 @@
 Package: Rchitecture
 Title: Rchitectural description
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: 
     person(given = "Benjamin",
            family = "Schwetz",
@@ -24,6 +24,7 @@ Imports:
     magrittr,
     purrr,
     reticulate,
+    stringr,
     tibble,
     tidygraph,
     tidyr

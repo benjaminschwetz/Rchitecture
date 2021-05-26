@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Rchitecture</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -135,14 +135,26 @@
     <p>Title</p>
     </div>
 
-    <pre class="usage"><span class='fu'>content_table</span><span class='op'>(</span><span class='va'>project_path</span>, <span class='va'>include_folders</span>, <span class='va'>path_prefix</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>content_table</span><span class='op'>(</span><span class='va'>project_path</span>, <span class='va'>include_folders</span>, <span class='va'>path_prefix</span>, .ignore_regex <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>project_path</th>
-      <td></td>
+      <td><p>absolute path pointing to the files</p></td>
+    </tr>
+    <tr>
+      <th>include_folders</th>
+      <td><p>should folders be included?</p></td>
+    </tr>
+    <tr>
+      <th>path_prefix</th>
+      <td><p>leading part of the absolute file paths that is not meaningful for the analysis</p></td>
+    </tr>
+    <tr>
+      <th>.ignore_regex</th>
+      <td><p>regex pattern for paths to exclude</p></td>
     </tr>
     </table>
 

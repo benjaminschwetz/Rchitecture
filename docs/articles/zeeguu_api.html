@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Rchitecture</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -98,10 +98,16 @@
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
+<div id="what-is-in-this-hand-in" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-is-in-this-hand-in" class="anchor"></a>What is in this hand-in?</h3>
+<p>I chose to submit an automated tool to aid architectural recovery as a hand-in. The full source code and documentation are available on <a href="https://benjaminschwetz.github.io/Rchitecture/">github</a>. For an intro on how to use it, see the last section, <strong>Reproduction</strong>.</p>
+<p>If we look at a software repository as a data source, we have two obvious tree structures, the abstract syntax tree (AST) for script files, and the file hierarchy of the repository as a whole. With <code>data.tree</code> and <code>igraph</code>, R has two mature packages to handle tree and graph structures. Furthermore, <code>tidygraph</code> and <code>ggraph</code> are recent packages for graph manipulation and visualization that follow the <a href="https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html">tidy data principles</a> and <a href="https://www.tandfonline.com/doi/abs/10.1198/jcgs.2009.07098">layered grammar of graphic</a> for manipulation and visualization of graphs. Last but not least, <code>reticulate</code> offers an interface to call python code and convert python objects to R objects. My goal for this project was test whether these packages could be combined to automatically generate insightful architectural views from python repositories. For the visualizations in this report, the file hierarchy was used directly as a graph, while the AST was used only indirectly to construct a dependency graph.</p>
+</div>
 <div id="what-is-the-system" class="section level3">
 <h3 class="hasAnchor">
 <a href="#what-is-the-system" class="anchor"></a>What is the system?</h3>
-<p>From the project website:</p>
+<p>The Zeeguu-Api repository is used as an example here to demonstrate the tool. From the project website:</p>
 <blockquote>
 <p>Zeeguu-API is an open API that allows tracking and modeling the progress of a learner in a foreign language with the goal of recommending paths to accelerate vocabulary acquisition. The API is also currently deployed as the backend for the zeeguu.org website.</p>
 </blockquote>
@@ -117,11 +123,10 @@
 <a href="#methodology" class="anchor"></a>Methodology</h2>
 <div id="tool-support" class="section level3">
 <h3 class="hasAnchor">
-<a href="#tool-support" class="anchor"></a>tool support:</h3>
-<p>I wrote my own scripts, with the following direct dependencies:</p>
+<a href="#tool-support" class="anchor"></a>Tool support:</h3>
+<p>I wrote my own scripts and released them under MIT license on <a href="https://benjaminschwetz.github.io/Rchitecture/">github</a>. Beyond the R dependencies that are specified in the <code>DESCRIPTION</code> file, I used <a href="https://github.com/maligree/python-ast-explorer">maligree/python-ast-explorer</a> for parsing python AST into data structures.</p>
+<p>The R packages I rely most on, are:</p>
 <ul>
-<li>
-<a href="https://github.com/maligree/python-ast-explorer">maligree/python-ast-explorer</a> for parsing python AST into data structures.</li>
 <li>📦<code>reticulate</code> for calling those python scripts from R</li>
 <li>📦<code>data.tree</code> for parsing yaml (and directories) into data.tree objects that could then be converted into igraph objects</li>
 <li>📦<code>igraph</code> behind the scenes and for implementations of different graph algorithms</li>
@@ -129,6 +134,7 @@
 <li>📦<code>ggraph</code> for plotting graphs</li>
 <li>📦<code>dplyr</code> for data wrangling</li>
 </ul>
+<p>To run the code in this document, you need to load the following packages into your R session:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/benjaminschwetz/Rchitecture">Rchitecture</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
@@ -140,37 +146,37 @@
 <span class="co">#&gt; The following objects are masked from 'package:base':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     intersect, setdiff, setequal, union</span></code></pre></div>
-<p>The code can be found on github: <a href="https://github.com/benjaminschwetz/Rchitecture">benjaminschwetz/Rchitecture</a> ### data gathering: what sources of data did you use? Source viewpoints?</p>
 </div>
 <div id="gathering-data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#gathering-data" class="anchor"></a>Gathering data</h3>
-<p>I did a static analysis on the source code from the git repository:</p>
+<p>I did a static analysis on the source code from the git repository. The first step was to download the data into a temporary directory:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">temp_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">zeeguu_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">temp_folder</span>, <span class="st">"/zeeguu_api"</span><span class="op">)</span>
 <span class="fu">git2r</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/git2r/reference/clone.html">clone</a></span><span class="op">(</span>url <span class="op">=</span> <span class="st">"https://github.com/zeeguu-ecosystem/Zeeguu-API.git"</span>,
              local_path  <span class="op">=</span> <span class="va">zeeguu_path</span><span class="op">)</span>
-<span class="co">#&gt; cloning into '/var/folders/t6/r8f4swn91n1cl2qw4dg80q4m0000gp/T//RtmpKDdaLl/zeeguu_api'...</span>
-<span class="co">#&gt; Receiving objects:   1% (49/4886),   24 kb</span>
-<span class="co">#&gt; Receiving objects:  11% (538/4886),  128 kb</span>
-<span class="co">#&gt; Receiving objects:  21% (1027/4886),  240 kb</span>
-<span class="co">#&gt; Receiving objects:  31% (1515/4886),  296 kb</span>
-<span class="co">#&gt; Receiving objects:  41% (2004/4886), 1481 kb</span>
-<span class="co">#&gt; Receiving objects:  51% (2492/4886), 1522 kb</span>
-<span class="co">#&gt; Receiving objects:  61% (2981/4886), 1586 kb</span>
-<span class="co">#&gt; Receiving objects:  71% (3470/4886), 1641 kb</span>
-<span class="co">#&gt; Receiving objects:  81% (3958/4886), 1697 kb</span>
-<span class="co">#&gt; Receiving objects:  91% (4447/4886), 2450 kb</span>
-<span class="co">#&gt; Receiving objects: 100% (4886/4886), 2535 kb, done.</span>
-<span class="co">#&gt; Local:    master /private/var/folders/t6/r8f4swn91n1cl2qw4dg80q4m0000gp/T/RtmpKDdaLl/zeeguu_api</span>
+<span class="co">#&gt; cloning into '/var/folders/t6/r8f4swn91n1cl2qw4dg80q4m0000gp/T//RtmpUYumvS/zeeguu_api'...</span>
+<span class="co">#&gt; Receiving objects:   1% (50/4938),   24 kb</span>
+<span class="co">#&gt; Receiving objects:  11% (544/4938),  128 kb</span>
+<span class="co">#&gt; Receiving objects:  21% (1037/4938),  248 kb</span>
+<span class="co">#&gt; Receiving objects:  31% (1531/4938),  296 kb</span>
+<span class="co">#&gt; Receiving objects:  41% (2025/4938), 1488 kb</span>
+<span class="co">#&gt; Receiving objects:  51% (2519/4938), 1536 kb</span>
+<span class="co">#&gt; Receiving objects:  61% (3013/4938), 1600 kb</span>
+<span class="co">#&gt; Receiving objects:  71% (3506/4938), 1648 kb</span>
+<span class="co">#&gt; Receiving objects:  81% (4000/4938), 1712 kb</span>
+<span class="co">#&gt; Receiving objects:  91% (4494/4938), 2479 kb</span>
+<span class="co">#&gt; Receiving objects: 100% (4938/4938), 2541 kb, done.</span>
+<span class="co">#&gt; Local:    master /private/var/folders/t6/r8f4swn91n1cl2qw4dg80q4m0000gp/T/RtmpUYumvS/zeeguu_api</span>
 <span class="co">#&gt; Remote:   master @ origin (https://github.com/zeeguu-ecosystem/Zeeguu-API.git)</span>
-<span class="co">#&gt; Head:     [305435e] 2021-05-14: Update feature_toggles.py</span></code></pre></div>
+<span class="co">#&gt; Head:     [70ae25e] 2021-05-25: Update student.py</span></code></pre></div>
 </div>
 <div id="knowlegde-inference" class="section level3">
 <h3 class="hasAnchor">
 <a href="#knowlegde-inference" class="anchor"></a>Knowlegde Inference</h3>
-<p>I aimed to make this as automatic/tool driven as possible. The only knowledge inference I used was that I knew from lectures that it is a python project.</p>
+<p>As stated previously, my aim was to develop an automatic tool. Thus, the only knowledge inference I used was that I knew from lectures that it is a python project. As can be seen from the code below, the tool can be used iteratively to fine tuning visualizations based on learnings.</p>
+<p>In my case, I realized that html files and the <code>tests</code> directory are not architecturally relevant after an initial exploration.</p>
 </div>
 </div>
 <div id="results" class="section level2">
@@ -179,12 +185,13 @@
 <div id="content-table" class="section level3">
 <h3 class="hasAnchor">
 <a href="#content-table" class="anchor"></a>Content table</h3>
-<p>This first table is more of a sanity check for the repository:</p>
+<p>The <code>content_table</code> function generates a table of content from the repository:</p>
 <blockquote>
 <p>Which file types occur most often and which files take most of the space?</p>
 </blockquote>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">folder_contents</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/content_table.html">content_table</a></span><span class="op">(</span><span class="va">zeeguu_path</span>, include_folders <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">temp_folder</span><span class="op">)</span></code></pre></div>
+<p><code>dplyr</code> verbs can then be used to summarize that table:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">folder_contents</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
@@ -209,7 +216,7 @@
 <tr class="odd">
 <td align="left">py</td>
 <td align="right">240</td>
-<td align="right">678611</td>
+<td align="right">678953</td>
 <td align="right">1390</td>
 </tr>
 <tr class="even">
@@ -286,7 +293,15 @@
 </tr>
 </tbody>
 </table>
-<p>From this table we can see that: - it is likely a python project, because of the high number of python files - using a sql database for storage, beause of the sql scripts - It is a web applications, since it has a lot of html data. - The project has a license - It is using one docker image for the entire repo - some shell scripts</p>
+<p>From this table we can see that:</p>
+<ul>
+<li>it is likely a python project, because of the high number of python files</li>
+<li>using a sql database for storage, beause of the sql scripts</li>
+<li>It is a web applications, since it has a lot of html data.</li>
+<li>The project has a license</li>
+<li>It is using one docker image for the entire repo</li>
+<li>some shell scripts</li>
+</ul>
 </div>
 <div id="repository-structure-view" class="section level3">
 <h3 class="hasAnchor">
@@ -296,19 +311,37 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/visualize_folder_type_and_size.html">visualize_folder_type_and_size</a></span><span class="op">(</span><span class="va">zeeguu_path</span>, path_prefix <span class="op">=</span> <span class="va">temp_folder</span><span class="op">)</span>
 <span class="co">#&gt; Non-leaf weights ignored</span>
 <span class="co">#&gt; Warning: Ignoring unknown parameters: check_overlap</span></code></pre></div>
-<p><img src="zeeguu_api_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="zeeguu_api_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
 <p>This view shows that <code>Zeeguu_core</code> and <code>Zeeguu_api</code> are the two only pure python folders. <code>tools</code> contains the aformentioned sql scripts and most of the html is located in actually just located in the tests.</p>
+<p>To improve the visualizations, we zoom in on the architecturally relevant content, by excluding the tests folder.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/visualize_folder_type_and_size.html">visualize_folder_type_and_size</a></span><span class="op">(</span><span class="va">zeeguu_path</span>, path_prefix <span class="op">=</span> <span class="va">temp_folder</span>,
+                               .ignore_regex <span class="op">=</span> <span class="st">"^zeeguu_api/tests"</span><span class="op">)</span>
+<span class="co">#&gt; Non-leaf weights ignored</span>
+<span class="co">#&gt; Warning: Ignoring unknown parameters: check_overlap</span></code></pre></div>
+<p><img src="zeeguu_api_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<p>This view shows that most of the python code is organized in the zeeguu_core and zeeguu_api folders and that those are <em>pure</em> python folders with a nesting of up to two more levels of sub-folders.</p>
 </div>
 <div id="package-dependency-view" class="section level3">
 <h3 class="hasAnchor">
 <a href="#package-dependency-view" class="anchor"></a>Package dependency view</h3>
+<div id="approach" class="section level4">
+<h4 class="hasAnchor">
+<a href="#approach" class="anchor"></a>Approach</h4>
 <p>I made a crude tokenizer from the <code>ast</code> module and used it to parse all <code>.py</code> files in the repository. Then I matched those tokens against the list of folder names in the repository to get a list of tokens that are (likely) dependencies. I then generated a graph, treating these mentions as edges. As it had too many nodes for a meaningful plot, I simplified the graph by aggregating the edges on a folder level. To preserve the weight information, I simply summed up the number of occurrences. I then arranged the nodes using a circular tree layout, based on the path hierarchy and encoded <code>occurences</code> in edge width and alpha. To make the plot more readable, I also scaled the nodes proportional to their centrality degree, counting incoming edges.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/internal_dependency_graph.html">internal_dependency_graph</a></span><span class="op">(</span><span class="va">zeeguu_path</span>, <span class="va">temp_folder</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="outcome" class="section level4">
+<h4 class="hasAnchor">
+<a href="#outcome" class="anchor"></a>Outcome</h4>
+<p>The visualization of the dependencies in the package can be seen below:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/internal_dependency_graph.html">internal_dependency_graph</a></span><span class="op">(</span><span class="va">zeeguu_path</span>, <span class="va">temp_folder</span>, .ignore_regex <span class="op">=</span> <span class="st">"^zeeguu_api/tests"</span><span class="op">)</span></code></pre></div>
 <div class="figure">
 <img src="view_img.png" style="width:100.0%" alt=""><p class="caption">View</p>
 </div>
 <p>The view cleary shows that <code>zeeguu_core</code> and more specifically <code>model</code> and <code>language</code> are heavily dependet on. One could argue that they were named properly. There is some overplotting occurring but it is still possible to look read dependencies for some of the nodes, i.e. <code>account_management</code> depends on the <code>teacher</code> module.</p>
+<p>It is interesting that the <code>tools</code> module also has some dependencies. Unfortunately, these are not readable due to overplotting.</p>
+</div>
 </div>
 </div>
 <div id="discussion" class="section level2">
@@ -318,6 +351,7 @@
 <h3 class="hasAnchor">
 <a href="#limitations" class="anchor"></a>Limitations</h3>
 <p>The tokenizer is <em>very</em> crude, I am using the ast tree as is. Unfortunately, from what I understand about python AST, this means relative paths and pythonian dot annotation (“class.method()”) are not resolved as separate tokens. Furthermore, I create an edge if the token is equal to a folder name. This results in false positives if identical names occur several times in the folder hierarchy or some folders names happen to be identical to a string in the python script that is not an import. This limits the information content of the visualizations. Future work should thus focus on improving the tokenizer.</p>
+<p>Additionally, some more options to filter the visualizations would be useful enable more iterative use of the package, e.g. allow for the ability to only plot outgoing edges from scripts in the tools directory would enable us to understand how this component relates to the rest of the repository.</p>
 </div>
 </div>
 <div id="conclusion" class="section level2">
@@ -329,6 +363,14 @@
 <li>How are they distributed across subfolders (packages)?</li>
 <li>What are the main dependencies within the project?</li>
 </ul>
+</div>
+<div id="reproduction" class="section level2">
+<h2 class="hasAnchor">
+<a href="#reproduction" class="anchor"></a>Reproduction</h2>
+<p>The full source code and documentation are available on <a href="https://benjaminschwetz.github.io/Rchitecture/">github</a>. To use it, you need to have R and python installed on your system, <a href="https://rstudio.github.io/reticulate/"><code>reticulate</code> configured</a>, and <a href="https://cran.r-project.org/web/packages/remotes/remotes.pdf">remotes</a> installed. To use the package run the following command in an R session:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"benjaminschwetz/Rchitecture"</span><span class="op">)</span></code></pre></div>
+<p>I haven’t had the possibility to test it on a Windows machine yet. I suspect that there might be some issues compared to macOS/Linux since this software is relying heavily on parsing absolute file paths as strings</p>
 </div>
   </div>
 
