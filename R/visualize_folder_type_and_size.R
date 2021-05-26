@@ -3,20 +3,20 @@
 #' @param folder_path path to the repository
 #' @param path_prefix leading folders from absolute path to omit from visualization.
 #' @export
-visualize_folder_type_and_size <- function(folder_path, path_prefix){
+visualize_folder_type_and_size <- function(folder_path, path_prefix, .ignore_regex = NULL){
   set.seed(35)
   # browser()
-  folder_contents <- content_table(zeeguu_path, include_folders = FALSE, path_prefix) %>%
+  folder_contents <- content_table(zeeguu_path, include_folders = FALSE, path_prefix, .ignore_regex) %>%
     mutate(path = stringr::str_replace_all(path,"/+", "/"))
   tree <- data.tree::as.Node(folder_contents,pathName="path")
   tree$Do(function(x) {
-    x$size <- Aggregate(node = x,
+    x$size <- data.tree::Aggregate(node = x,
                               attribute = "size",
                               aggFun = sum)
   },
   traversal = "post-order")
   tree$Do(function(x) {
-    x$content_type <- Aggregate(node = x,
+    x$content_type <- data.tree::Aggregate(node = x,
                         attribute = "file_type",
                         aggFun = function(x){
                           n_vals <- length(unique(x))
@@ -45,8 +45,8 @@ visualize_folder_type_and_size <- function(folder_path, path_prefix){
   tbl_graph %>%
     tidygraph::filter(isdir) %>%
   ggraph::ggraph('circlepack', weight = size) +
-    ggraph::geom_node_circle(aes(fill = content_type)) +
-    ggraph::geom_node_label(aes(label = short_name, filter = depth == 1), nudge_y= -150, repel = FALSE, check_overlap = FALSE)+
+    ggraph::geom_node_circle(ggplot2::aes(fill = content_type)) +
+    ggraph::geom_node_label(ggplot2::aes(label = short_name, filter = depth == 1), nudge_y= -150, repel = FALSE, check_overlap = FALSE)+
     ggplot2::coord_fixed() +
     ggplot2::theme_void() +
     ggplot2::scale_fill_brewer(type = "qual")

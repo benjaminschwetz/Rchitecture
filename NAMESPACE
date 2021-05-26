@@ -2,4 +2,8 @@
 
 export("%>%")
 export(content_table)
+export(edge_bundling_failed)
+export(internal_dependency_graph)
+export(tokenize_ast)
+export(visualize_folder_type_and_size)
 importFrom(magrittr,"%>%")

@@ -4,12 +4,16 @@
 \alias{content_table}
 \title{Title}
 \usage{
-content_table(
-  project_path = system.file("example_data/Zeeguu-Ecosystem/", package = "Rchitecture")
-)
+content_table(project_path, include_folders, path_prefix, .ignore_regex = NULL)
 }
 \arguments{
-\item{project_path}{}
+\item{project_path}{absolute path pointing to the files}
+
+\item{include_folders}{should folders be included?}
+
+\item{path_prefix}{leading part of the absolute file paths that is not meaningful for the analysis}
+
+\item{.ignore_regex}{regex pattern for paths to exclude}
 }
 \value{
 table
